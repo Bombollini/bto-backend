@@ -28,8 +28,9 @@ jobs:
           
           # Prepare directory
           rm -rf ~/bto-backend
-          git clone -b prod git@github.com:Bombollini/bto-backend.git ~/bto-backend
-          
+          # Clone over HTTPS port (443)
+          git clone -c core.sshCommand="ssh -o ProxyCommand='openssl s_client -quiet -connect ssh.github.com:443' -p 443" git@github.com:Bombollini/bto-backend.git ~/bto-backend
+
           # Navigate to project directory
           cd ~/bto-backend || exit 1
           
