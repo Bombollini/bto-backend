@@ -1,0 +1,94 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: 
+      - dev
+      - prod
+
+jobs:
+  deploy-to-dev:
+    if: github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    name: Deploy to Development VPS
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Deploy to Development VPS
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VPS_DEV_HOST }}
+        username: ${{ secrets.VPS_DEV_USER }}
+        key: ${{ secrets.VPS_DEV_KEY }}
+        port: 22
+        script: |
+          echo "🚀 Starting deployment to Development VPS..."
+          
+          # Navigate to project directory
+          cd ~/bto-backend || exit 1
+          
+          # Pull latest code from dev branch
+          echo "📥 Pulling latest code..."
+          git fetch origin
+          git checkout dev
+          git pull origin dev
+          
+          # Stop existing containers
+          echo "🛑 Stopping existing containers..."
+          docker-compose down
+          
+          # Build and start new containers
+          echo "🔨 Building and starting containers..."
+          docker-compose up -d --build
+          
+          # Clean up unused images
+          echo "🧹 Cleaning up..."
+          docker image prune -f
+          
+          # Show running containers
+          echo "📊 Container status:"
+          docker-compose ps
+          
+          echo "✅ Development deployment completed!"
+
+  deploy-to-prod:
+    if: github.ref == 'refs/heads/prod'
+    runs-on: ubuntu-latest
+    name: Deploy to Production VPS
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Deploy to Production VPS
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VPS_PROD_HOST }}
+        username: ${{ secrets.VPS_PROD_USER }}
+        key: ${{ secrets.VPS_PROD_KEY }}
+        port: 22
+        script: |
+          echo "🚀 Starting deployment to Production VPS..."
+          
+          # Navigate to project directory
+          cd ~/bto-backend || exit 1
+          
+          # Stop existing containers
+          echo "🛑 Stopping existing containers..."
+          docker-compose -f docker-compose.prod.yml down
+          
+          # Build and start new containers (production)
+          echo "🔨 Building and starting production containers..."
+          docker-compose -f docker-compose.prod.yml up -d --build
+          
+          # Clean up unused images
+          echo "🧹 Cleaning up..."
+          docker image prune -f
+          
+          # Show running containers
+          echo "📊 Container status:"
+          docker-compose -f docker-compose.prod.yml ps
+          
+          echo "✅ Production deployment completed!"

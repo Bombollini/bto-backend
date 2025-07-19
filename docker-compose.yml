@@ -1,14 +1,18 @@
-version: "3.8"
-
+# docker-compose.yml for Development Environment (dev branch)
 services:
-  bto-backend:
-    container_name: bto-backend
-    build: .
-    restart: always
+  backend:
+    build:
+      context: .
+      target: development
+    image: bto-backend:dev
+    container_name: bto-backend-dev
     ports:
-      - "4000:3000" # 4000 untuk akses dari luar, 3000 port default NestJS
-    env_file:
-      - .env
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
     volumes:
-      - .:/usr/src/app
-    command: npm run start:prod
+      # Mount source code for hot reload in development
+      - .:/app
+      - /app/node_modules
+    restart: always

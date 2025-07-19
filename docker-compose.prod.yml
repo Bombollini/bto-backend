@@ -1,0 +1,15 @@
+# docker-compose.yml for Production Environment (prod branch)
+services:
+  backend:
+    build:
+      context: .
+      target: production
+    image: bto-backend:prod
+    container_name: bto-backend-prod
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: always
+    # No volumes in production for better security and performance
