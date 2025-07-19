@@ -71,8 +71,9 @@ jobs:
         port: 22
         script: |
           echo "🚀 Starting deployment to Production VPS..."
-          
-          # Navigate to project directory
+          # Prepare directory
+          rm -rf ~/bto-backend
+          git clone -b prod git@github.com:Bombollini/bto-backend.git ~/bto-backend
           cd ~/bto-backend || exit 1
           
           # Stop existing containers
