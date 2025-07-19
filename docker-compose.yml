@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  bto-backend:
+    container_name: bto-backend
+    build: .
+    restart: always
+    ports:
+      - "4000:3000" # 4000 untuk akses dari luar, 3000 port default NestJS
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/src/app
+    command: npm run start:prod
