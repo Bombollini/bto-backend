@@ -29,16 +29,10 @@ jobs:
           
           # Prepare directory
           rm -rf ~/bto-backend
-          git clone -b dev git@github.com:Bombollini/bto-backend.git ~/bto-backend
+          git clone -b dev https://github.com/Bombollini/bto-backend-dev.git ~/bto-backend
           
           # Navigate to project directory
           cd ~/bto-backend || exit 1
-          
-          # Pull latest code from dev branch
-          echo "📥 Pulling latest code..."
-          git fetch origin
-          git checkout dev
-          git pull origin dev
           
           # Stop existing containers
           echo "🛑 Stopping existing containers..."
@@ -77,6 +71,9 @@ jobs:
         script: |
           echo "🚀 Starting deployment to Production VPS..."
           
+          # Prepare directory
+          rm -rf ~/bto-backend
+          git clone -b prod https://github.com/Bombollini/bto-backend-dev.git ~/bto-backend
           cd ~/bto-backend || exit 1
           
           # Stop existing containers
