@@ -24,6 +24,7 @@ jobs:
         key: ${{ secrets.VPS_DEV_KEY }}
         port: 22
         script: |
+          # Ensure the working directory exists
           echo "🚀 Starting deployment to Development VPS..."
           
           # Prepare directory
