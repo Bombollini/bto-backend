@@ -29,11 +29,11 @@ jobs:
           
           # Prepare directory
           rm -rf ~/bto-backend
-          git clone -b dev https://github.com/Bombollini/bto-backend-dev.git ~/bto-backend
+          git clone -b dev git@github.com:Bombollini/bto-backend-dev.git ~/bto-backend-dev
           
           # Navigate to project directory
-          cd ~/bto-backend || exit 1
-          
+          cd ~/bto-backend-dev || exit 1
+
           # Stop existing containers
           echo "🛑 Stopping existing containers..."
           docker-compose down
@@ -72,9 +72,9 @@ jobs:
           echo "🚀 Starting deployment to Production VPS..."
           
           # Prepare directory
-          rm -rf ~/bto-backend
-          git clone -b prod https://github.com/Bombollini/bto-backend-dev.git ~/bto-backend
-          cd ~/bto-backend || exit 1
+          rm -rf ~/bto-backend-prod
+          git clone -b prod https://github.com/Bombollini/bto-backend-dev.git ~/bto-backend-prod
+          cd ~/bto-backend-prod || exit 1
           
           # Stop existing containers
           echo "🛑 Stopping existing containers..."
