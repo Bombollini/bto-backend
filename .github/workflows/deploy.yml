@@ -71,6 +71,8 @@ jobs:
           # Verify containers started
           if [ $? -ne 0 ]; then
             echo "❌ Failed to start containers!"
+            echo "📋 Checking logs from container:"
+            docker logs bto-backend-dev || echo "⚠️ Could not retrieve container logs" 
             exit 1
           fi
           
@@ -140,13 +142,31 @@ jobs:
           echo "🛑 Stopping existing containers..."
           docker-compose -f docker-compose.prod.yml down || echo "⚠️ No containers to stop or docker-compose failed"
           
+          # Print Node.js and npm versions
+          echo "🔍 Node version:"
+          node -v
+          echo "🔍 NPM version:"
+          npm -v
+          
           # Build and start new containers (production)
           echo "🔨 Building and starting production containers..."
-          docker-compose -f docker-compose.prod.yml up -d --build
+          # Using --no-cache but removing unsupported --progress flag
+          docker-compose -f docker-compose.prod.yml build --no-cache
+          
+          # If build succeeds, start the containers
+          if [ $? -eq 0 ]; then
+            echo "✅ Build succeeded, starting containers..."
+            docker-compose -f docker-compose.prod.yml up -d
+          else
+            echo "❌ Docker build failed!"
+            exit 1
+          fi
           
           # Verify containers started
-          if [ $? -ne 0 ]; then
+          if ! docker ps | grep -q bto-backend-prod; then
             echo "❌ Failed to start containers!"
+            echo "📋 Checking logs from container:"
+            docker logs bto-backend-prod || echo "⚠️ Could not retrieve container logs"
             exit 1
           fi
           
