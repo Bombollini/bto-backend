@@ -49,8 +49,10 @@ RUN npm ci --omit=dev
 
 # Copy only the built files from the builder stage
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/.bin ./node_modules/.bin
+# Copy necessary files and folders for running the app
+COPY --from=builder /app/node_modules ./node_modules
+# Copy any additional configuration files that might be needed at runtime
+COPY --from=builder /app/package.json ./package.json
 
 # Expose port
 EXPOSE 3000

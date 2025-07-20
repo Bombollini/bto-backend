@@ -148,9 +148,10 @@ jobs:
           echo "🔍 NPM version:"
           npm -v
           
-          # Build and start new containers (production) with detailed output
+          # Build and start new containers (production)
           echo "🔨 Building and starting production containers..."
-          docker-compose -f docker-compose.prod.yml build --no-cache --progress=plain
+          # Using --no-cache but removing unsupported --progress flag
+          docker-compose -f docker-compose.prod.yml build --no-cache
           
           # If build succeeds, start the containers
           if [ $? -eq 0 ]; then
