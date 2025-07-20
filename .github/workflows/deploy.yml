@@ -28,19 +28,51 @@ jobs:
           echo "🚀 Starting deployment to Development VPS..."
           
           # Prepare directory
-          rm -rf ~/bto-backend
-          git clone -b dev https://github.com/Bombollini/bto-backend-dev.git ~/bto-backend
+          cd ~
           
-          # Navigate to project directory
-          cd ~/bto-backend || exit 1
+          # Check if directory exists but is not a valid git repo
+          if [ -d ~/bto-backend-dev ] && [ ! -d ~/bto-backend-dev/.git ]; then
+            echo "�️ Found invalid repository, removing it..."
+            rm -rf ~/bto-backend-dev
+          fi
+          
+          # Clone or update repository
+          if [ -d ~/bto-backend-dev ]; then
+            echo "📂 Repository exists, fetching latest changes..."
+            cd ~/bto-backend-dev
+            git fetch origin || { echo "❌ Fetch failed, recreating repository"; rm -rf ~/bto-backend-dev; git clone -b dev https://github.com/Bombollini/bto-backend.git ~/bto-backend-dev; cd ~/bto-backend-dev; }
+            git checkout dev || { echo "❌ Checkout failed, recreating repository"; rm -rf ~/bto-backend-dev; git clone -b dev https://github.com/Bombollini/bto-backend.git ~/bto-backend-dev; cd ~/bto-backend-dev; }
+            git reset --hard origin/dev || { echo "❌ Reset failed, recreating repository"; rm -rf ~/bto-backend-dev; git clone -b dev https://github.com/Bombollini/bto-backend.git ~/bto-backend-dev; cd ~/bto-backend-dev; }
+          else
+            echo "📂 Cloning fresh repository..."
+            git clone -b dev https://github.com/Bombollini/bto-backend.git ~/bto-backend-dev
+            cd ~/bto-backend-dev
+          fi
+          
+          # Verify we have the files
+          echo "📋 Checking repository contents:"
+          ls -la
+
+          # Check if docker-compose file exists
+          if [ ! -f docker-compose.yml ]; then
+            echo "❌ docker-compose.yml not found! Content of directory:"
+            ls -la
+            exit 1
+          fi
           
           # Stop existing containers
           echo "🛑 Stopping existing containers..."
-          docker-compose down
+          docker-compose down || echo "⚠️ No containers to stop or docker-compose failed"
           
           # Build and start new containers
           echo "🔨 Building and starting containers..."
           docker-compose up -d --build
+          
+          # Verify containers started
+          if [ $? -ne 0 ]; then
+            echo "❌ Failed to start containers!"
+            exit 1
+          fi
           
           # Clean up unused images
           echo "🧹 Cleaning up..."
@@ -64,25 +96,59 @@ jobs:
     - name: Deploy to Production VPS
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.VPS_PROD_HOST }}
-        username: ${{ secrets.VPS_PROD_USER }}
-        key: ${{ secrets.VPS_PROD_KEY }}
+        host: ${{ secrets.VPS_DEV_HOST }}
+        username: ${{ secrets.VPS_DEV_USER }}
+        key: ${{ secrets.VPS_DEV_KEY }}
         port: 22
         script: |
           echo "🚀 Starting deployment to Production VPS..."
           
           # Prepare directory
-          rm -rf ~/bto-backend
-          git clone -b prod https://github.com/Bombollini/bto-backend-dev.git ~/bto-backend
-          cd ~/bto-backend || exit 1
+          cd ~
+          
+          # Check if directory exists but is not a valid git repo
+          if [ -d ~/bto-backend-prod ] && [ ! -d ~/bto-backend-prod/.git ]; then
+            echo "�️ Found invalid repository, removing it..."
+            rm -rf ~/bto-backend-prod
+          fi
+          
+          # Clone or update repository
+          if [ -d ~/bto-backend-prod ]; then
+            echo "📂 Repository exists, fetching latest changes..."
+            cd ~/bto-backend-prod
+            git fetch origin || { echo "❌ Fetch failed, recreating repository"; rm -rf ~/bto-backend-prod; git clone -b prod https://github.com/Bombollini/bto-backend.git ~/bto-backend-prod; cd ~/bto-backend-prod; }
+            git checkout prod || { echo "❌ Checkout failed, recreating repository"; rm -rf ~/bto-backend-prod; git clone -b prod https://github.com/Bombollini/bto-backend.git ~/bto-backend-prod; cd ~/bto-backend-prod; }
+            git reset --hard origin/prod || { echo "❌ Reset failed, recreating repository"; rm -rf ~/bto-backend-prod; git clone -b prod https://github.com/Bombollini/bto-backend.git ~/bto-backend-prod; cd ~/bto-backend-prod; }
+          else
+            echo "📂 Cloning fresh repository..."
+            git clone -b prod https://github.com/Bombollini/bto-backend.git ~/bto-backend-prod
+            cd ~/bto-backend-prod
+          fi
+          
+          # Verify we have the files
+          echo "📋 Checking repository contents:"
+          ls -la
+          
+          # Check if docker-compose.prod.yml file exists
+          if [ ! -f docker-compose.prod.yml ]; then
+            echo "❌ docker-compose.prod.yml not found! Content of directory:"
+            ls -la
+            exit 1
+          fi
           
           # Stop existing containers
           echo "🛑 Stopping existing containers..."
-          docker-compose -f docker-compose.prod.yml down
+          docker-compose -f docker-compose.prod.yml down || echo "⚠️ No containers to stop or docker-compose failed"
           
           # Build and start new containers (production)
           echo "🔨 Building and starting production containers..."
           docker-compose -f docker-compose.prod.yml up -d --build
+          
+          # Verify containers started
+          if [ $? -ne 0 ]; then
+            echo "❌ Failed to start containers!"
+            exit 1
+          fi
           
           # Clean up unused images
           echo "🧹 Cleaning up..."
