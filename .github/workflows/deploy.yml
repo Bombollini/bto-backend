@@ -28,11 +28,17 @@ jobs:
           echo "🚀 Starting deployment to Development VPS..."
           
           # Prepare directory
-          rm -rf ~/bto-backend-dev
-          git clone -b dev git@github.com:Bombollini/bto-backend.git ~/bto-backend-dev
-          
-          # Navigate to project directory
-          cd ~/bto-backend-dev || exit 1
+          if [ -d ~/bto-backend-dev ]; then
+            echo "📂 Repository already exists, fetching latest changes..."
+            cd ~/bto-backend-dev
+            git fetch origin
+            git checkout dev
+            git reset --hard origin/dev
+          else
+            echo "📂 Cloning repository..."
+            git clone -b dev git@github.com:Bombollini/bto-backend.git ~/bto-backend-dev
+            cd ~/bto-backend-dev
+          fi
 
           # Stop existing containers
           echo "🛑 Stopping existing containers..."
@@ -64,17 +70,25 @@ jobs:
     - name: Deploy to Production VPS
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.VPS_DEV_HOST }}
-        username: ${{ secrets.VPS_DEV_USER }}
-        key: ${{ secrets.VPS_DEV_KEY }}
+        host: ${{ secrets.VPS_PROD_HOST }}
+        username: ${{ secrets.VPS_PROD_USER }}
+        key: ${{ secrets.VPS_PROD_KEY }}
         port: 22
         script: |
           echo "🚀 Starting deployment to Production VPS..."
           
           # Prepare directory
-          rm -rf ~/bto-backend-prod
-          git clone -b prod https://github.com/Bombollini/bto-backend.git ~/bto-backend-prod
-          cd ~/bto-backend-prod || exit 1
+          if [ -d ~/bto-backend-prod ]; then
+            echo "📂 Repository already exists, fetching latest changes..."
+            cd ~/bto-backend-prod
+            git fetch origin
+            git checkout prod
+            git reset --hard origin/prod
+          else
+            echo "📂 Cloning repository..."
+            git clone -b prod https://github.com/Bombollini/bto-backend.git ~/bto-backend-prod
+            cd ~/bto-backend-prod
+          fi
           
           # Stop existing containers
           echo "🛑 Stopping existing containers..."
