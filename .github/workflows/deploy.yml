@@ -29,7 +29,7 @@ jobs:
           
           # Prepare directory
           rm -rf ~/bto-backend
-          git clone -b dev git@github.com:Bombollini/bto-backend-dev.git ~/bto-backend-dev
+          git clone -b dev git@github.com:Bombollini/bto-backend.git ~/bto-backend-dev
           
           # Navigate to project directory
           cd ~/bto-backend-dev || exit 1
@@ -64,16 +64,16 @@ jobs:
     - name: Deploy to Production VPS
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.VPS_PROD_HOST }}
-        username: ${{ secrets.VPS_PROD_USER }}
-        key: ${{ secrets.VPS_PROD_KEY }}
+        host: ${{ secrets.VPS_DEV_HOST }}
+        username: ${{ secrets.VPS_DEV_USER }}
+        key: ${{ secrets.VPS_DEV_KEY }}
         port: 22
         script: |
           echo "🚀 Starting deployment to Production VPS..."
           
           # Prepare directory
           rm -rf ~/bto-backend-prod
-          git clone -b prod https://github.com/Bombollini/bto-backend-dev.git ~/bto-backend-prod
+          git clone -b prod https://github.com/Bombollini/bto-backend.git ~/bto-backend-prod
           cd ~/bto-backend-prod || exit 1
           
           # Stop existing containers
