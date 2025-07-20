@@ -7,10 +7,10 @@ services:
     image: bto-backend:prod
     container_name: bto-backend-prod
     ports:
-      - "3000:3000"
+      - "3001:3001"
     environment:
       - NODE_ENV=production
-      - PORT=3000
+      - PORT=3001
       # Add other environment variables as needed
     restart: always
     # No volumes in production for better security and performance
@@ -20,7 +20,7 @@ services:
         max-size: "10m"
         max-file: "3"
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (r) => r.statusCode !== 200 ? process.exit(1) : process.exit(0))"]
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001', (r) => r.statusCode !== 200 ? process.exit(1) : process.exit(0))"]
       interval: 30s
       timeout: 10s
       retries: 3

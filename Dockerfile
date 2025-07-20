@@ -40,6 +40,7 @@ WORKDIR /app
 
 # Set NODE_ENV
 ENV NODE_ENV=production
+ENV PORT=3001
 
 # Copy package files
 COPY package*.json ./
@@ -55,7 +56,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
 # Expose port
-EXPOSE 3000
+EXPOSE 3001
 
 # Start in production mode
 CMD ["npm", "run", "start:prod"]
