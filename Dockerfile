@@ -17,9 +17,15 @@ CMD ["npm", "run", "start:dev"]
 # Production stage
 FROM base AS production
 ENV NODE_ENV=production
-RUN npm ci --only=production
+# Install all dependencies (including dev dependencies needed for build)
+RUN npm ci
 COPY . .
+# Install NestJS CLI globally to ensure it's available for the build
+RUN npm install -g @nestjs/cli
+# Build the application
 RUN npm run build
+# Remove dev dependencies to make the image smaller
+RUN npm ci --omit=dev
 EXPOSE 3000
 CMD ["npm", "run", "start:prod"]
 

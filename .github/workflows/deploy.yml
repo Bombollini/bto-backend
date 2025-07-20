@@ -71,6 +71,8 @@ jobs:
           # Verify containers started
           if [ $? -ne 0 ]; then
             echo "❌ Failed to start containers!"
+            echo "📋 Checking logs from container:"
+            docker logs bto-backend-dev || echo "⚠️ Could not retrieve container logs" 
             exit 1
           fi
           
@@ -147,6 +149,8 @@ jobs:
           # Verify containers started
           if [ $? -ne 0 ]; then
             echo "❌ Failed to start containers!"
+            echo "📋 Checking logs from container:"
+            docker logs bto-backend-prod || echo "⚠️ Could not retrieve container logs"
             exit 1
           fi
           
