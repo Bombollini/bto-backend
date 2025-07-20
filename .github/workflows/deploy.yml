@@ -28,7 +28,7 @@ jobs:
           echo "🚀 Starting deployment to Development VPS..."
           
           # Prepare directory
-          rm -rf ~/bto-backend
+          rm -rf ~/bto-backend-dev
           git clone -b dev git@github.com:Bombollini/bto-backend.git ~/bto-backend-dev
           
           # Navigate to project directory
